@@ -10,4 +10,4 @@ services:
   filesservice:
     image: aleygues/files-service
     ports:
-      - 3020:3020
+      - 3020:8080

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const FILES_SERVICE_URI = 'http://localhost:3200';
+const FILES_SERVICE_URI = 'http://localhost:3020';
 
 function App() {
   const [firstname, setFirstname] = useState('');
@@ -14,10 +14,10 @@ function App() {
         const formData = new FormData();
         formData.append('file', event.target.files[0]);
         const result = await axios({
-          method: "post",
-          url: FILES_SERVICE_URI,
+          method: 'post',
+          url: FILES_SERVICE_URI + '/api/files',
           data: formData,
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { 'Content-Type': 'multipart/form-data' },
         });
         if (result.data?.uri) {
           setAvatar(result.data.uri);
@@ -29,7 +29,15 @@ function App() {
   }
 
   const sendForm = () => {
-
+    // send to API
+    if(!firstname || !lastname || !avatar) {
+      return alert('Firstname, lastname and avatar required');
+    } else {
+      alert(`Sending: ${JSON.stringify({ firstname, lastname, avatar }, null, 4)}`);
+      setFirstname('');
+      setLastname('');
+      setAvatar('');
+    }
   }
 
   return (
