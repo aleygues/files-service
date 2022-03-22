@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
-import FileModel from '../models/File';
 
-const storagePath = process.env.STORAGE_PATH || (process.cwd() + '/uploads');
+const storagePath = process.env.STORAGE_PATH || '/app/uploads';
 
 function respondWithFileNotFound(res: Response): void {
     res.status(404).json({ message: 'file_not_found' });
@@ -21,29 +20,21 @@ function respondWithFile(filename: string, res: Response): void {
 }
 
 export async function deleteOne(req: Request, res: Response) {
-    const file = await FileModel.findById(req.params.id);
-    if (file) {
-        try {
-            fs.rmSync(`${storagePath}/${file.filename}`);
-        } catch { }
-        await file.remove();
-    }
+    try {
+        fs.rmSync(`${storagePath}/${req.params.filename}`);
+    } catch { }
     res.status(204).send();
 }
 
 export async function readOne(req: Request, res: Response) {
-    const file = await FileModel.findById(req.params.id);
-    respondWithFile(file?.filename, res);
+    respondWithFile(req.params.filename, res);
 }
 
 export async function create(req: Request, res: Response) {
     if (req.file) {
-        const doc = await FileModel.create({
-            filename: req.file.filename,
-        });
         res.json({
-            id: doc._id,
-            uri: `/api/files/${doc._id}`
+            filename: req.file.filename,
+            uri: `/api/files/${req.file.filename}`
         });
     } else {
         res.status(400).json({ message: 'missing_file' });

@@ -4,8 +4,4 @@ services:
   app:
     build: .
     ports:
-      - 3020:3020
-    environment:
-      - MONGO_URI=mongodb://db:27017/filesservice
-  db:
-    image: mongo
+      - 3020:8080

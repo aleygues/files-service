@@ -2,10 +2,18 @@ import { RequestHandler, Router } from 'express';
 import { create, deleteOne, readOne } from '../controllers/files';
 import multer from 'multer';
 
-const storagePath = process.env.STORAGE_PATH || (process.cwd() + '/uploads');
+const storagePath = process.env.STORAGE_PATH || '/app/uploads';
 
 const upload = multer({
-    storage: multer.diskStorage({ destination: storagePath })
+    storage: multer.diskStorage({
+        destination: storagePath,
+        filename: (req, file, callback) => {
+            const originalExtension = (file.originalname.split('.').pop() || '').toLowerCase();
+            const extension = /^[a-z_-]{1,20}$/.test(originalExtension) ? originalExtension : 'unknown';
+            const filename = `${Date.now()}-${Math.floor(Math.random() * 8999) + 1000}.${extension}`;
+            callback(null, filename);
+        }
+    })
 });
 
 function asyncHandler(handler: Function): RequestHandler {
@@ -21,8 +29,8 @@ function asyncHandler(handler: Function): RequestHandler {
 
 const router = Router();
 
-router.delete('/:id', asyncHandler(deleteOne));
-router.get('/:id', asyncHandler(readOne));
+router.delete('/:filename', asyncHandler(deleteOne));
+router.get('/:filename', asyncHandler(readOne));
 router.post('/', upload.single('file'), asyncHandler(create));
 
 export default router; 
