@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  app:
+    image: aleygues/files-service
+    ports:
+      - 3020:8080
